@@ -4,4 +4,4 @@ This backend is responsible to handle:
 - Task schedules
 
 ## Database
-Please, see the [DATABASE documentation](./DATABASE.md).
+Please, see the [DATABASE documentation](./docs/DATABASE.md).

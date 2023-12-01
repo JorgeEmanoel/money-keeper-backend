@@ -3,10 +3,15 @@ users
     name
     email
     password
-    main_income_value
-    main_income_currency
 
-transactions
+skeleton_plans
+    id
+    name
+    description
+    status (ENABLED, DISABLED)
+    user_id
+
+skeletons
     id
     name
     description
@@ -14,10 +19,16 @@ transactions
     frequency (monthly, anual, random)
     value
     currency
-    reference (MONTH-YEAR)
+    plan_id
     user_id
 
-commitments
+transactions
     id
-    transaction_id
+    name
+    description
+    type (income, outcome)
+    value
+    currency
     reference (MONTH-YEAR)
+    status (PENDING, PAID, CANCELED)
+    user_id

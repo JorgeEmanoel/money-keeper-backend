@@ -1,11 +1,18 @@
 package api
 
-import "net/http"
+import (
+	"database/sql"
+	"net/http"
+)
 
-type Router struct{}
+type Router struct {
+	Db *sql.DB
+}
 
-func MakeRouter() *Router {
-	return &Router{}
+func MakeRouter(db *sql.DB) *Router {
+	return &Router{
+		Db: db,
+	}
 }
 
 func (r *Router) HandleRoot(w http.ResponseWriter, req *http.Request) {

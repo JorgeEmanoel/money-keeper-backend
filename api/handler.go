@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,12 +12,14 @@ import (
 type Handler struct {
 	Addr string
 	Port int
+	Db   *sql.DB
 }
 
-func CreateHandler(addr string, port int) *Handler {
+func CreateHandler(addr string, port int, db *sql.DB) *Handler {
 	return &Handler{
 		Addr: addr,
 		Port: port,
+		Db:   db,
 	}
 }
 
@@ -24,7 +27,7 @@ func (h *Handler) Start() {
 	log.Printf("HTTP handler running at %s:%d\n", h.Addr, h.Port)
 	r := mux.NewRouter()
 
-	router := MakeRouter()
+	router := MakeRouter(h.Db)
 
 	r.HandleFunc("/", router.HandleRoot)
 	r.HandleFunc("/health", router.HandleHealth)

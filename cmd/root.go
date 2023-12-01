@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/JorgeEmanoel/money-keeper-backend/database"
 	"github.com/spf13/cobra"
 )
 
@@ -19,11 +20,16 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if args[0] == "help" {
+			usage()
+			return
+		}
+
 		switch args[0] {
 		case "serve":
-			Serve()
-		case "help":
-			usage()
+			Serve(database.Connect())
+		case "migrate":
+			Migrate(database.Connect())
 		default:
 			log.Fatal("Invalid command")
 		}

@@ -1,0 +1,49 @@
+version: '3.3'
+services:
+  database:
+    image: mysql:8
+    container_name: money_keeper_database
+    restart: on-failure
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - database_data:/var/lib/mysql
+  migration:
+    image: ${IMAGE}
+    container_name: money_keeper_migration
+    restart: on-failure
+    depends_on:
+      - database
+    command: migrate
+    links:
+      - database
+    environment:
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: 8080
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: money_keeper
+  api:
+    image: ${IMAGE}
+    container_name: money_keeper_api
+    restart: on-failure
+    depends_on:
+      - migration
+    command: serve
+    links:
+      - database
+    environment:
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: 8080
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: money_keeper
+
+volumes:
+  database_data:

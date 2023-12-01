@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"database/sql"
 	"log"
 	"os"
 	"strconv"
@@ -8,7 +9,7 @@ import (
 	"github.com/JorgeEmanoel/money-keeper-backend/api"
 )
 
-func Serve() {
+func Serve(db *sql.DB) {
 	host, ok := os.LookupEnv("HTTP_HOST")
 
 	if !ok {
@@ -25,6 +26,6 @@ func Serve() {
 
 	portNumber, _ := strconv.Atoi(port)
 
-	h := api.CreateHandler(host, portNumber)
+	h := api.CreateHandler(host, portNumber, db)
 	h.Start()
 }

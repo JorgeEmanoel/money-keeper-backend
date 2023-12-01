@@ -10,32 +10,24 @@ services:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - database_data:/var/lib/mysql
-  migration:
-    image: ${IMAGE}
-    container_name: money_keeper_migration
-    restart: on-failure
-    depends_on:
-      - database
-    command: migrate
-    links:
-      - database
-    environment:
-      HTTP_HOST: 0.0.0.0
-      HTTP_PORT: 8080
-      DB_HOST: database
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: money_keeper
   api:
     image: ${IMAGE}
     container_name: money_keeper_api
+    working_dir: /app
     restart: on-failure
     depends_on:
-      - migration
-    command: serve
+      - database
+    command:
+      - air
+      - -c
+      - .air.toml
+      - serve
     links:
       - database
+    ports:
+      - 8080:8080
+    volumes:
+      - ../../:/app
     environment:
       HTTP_HOST: 0.0.0.0
       HTTP_PORT: 8080
@@ -44,6 +36,7 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: money_keeper
+      CIPHER_KEY: a78fcb96dcdd64f884add85af738389e40947d75e5f454d106d1afc45cbf1892
 
 volumes:
   database_data:

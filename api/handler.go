@@ -29,8 +29,10 @@ func (h *Handler) Start() {
 
 	router := MakeRouter(h.Db)
 
-	r.HandleFunc("/", router.HandleRoot)
-	r.HandleFunc("/health", router.HandleHealth)
+	r.HandleFunc("/", router.HandleRoot).Methods("GET")
+	r.HandleFunc("/health", router.HandleHealth).Methods("GET")
+
+	r.HandleFunc("/register", router.HandleRegistration).Methods("POST")
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", h.Addr, h.Port),

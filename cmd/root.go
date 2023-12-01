@@ -49,5 +49,6 @@ func usage() {
 
 The commands are:
 	serve	Start HTTP server
+	migrate	Migrate the database
 	help	Displays this message`)
 }

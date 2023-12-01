@@ -1,7 +1,7 @@
 export IMAGE=money-keeper-backend:local-$(uuidgen)
 
 BUILD_CONTEXT=./
-DOCKERFILE=.infra/Dockerfile
+DOCKERFILE=.infra/Dockerfile_dev
 
 echo "Building image: $IMAGE"
 

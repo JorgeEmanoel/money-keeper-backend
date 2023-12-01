@@ -17,3 +17,11 @@ database:
 .PHONY: api
 api:
 	docker exec -it money_keeper_api bash
+
+.PHONY: logs
+logs:
+	docker logs -f money_keeper_api
+
+.PHONY: migrate
+migrate:
+	docker exec -i money_keeper_api sh -c "/app/tmp/main migrate"

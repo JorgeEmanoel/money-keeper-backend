@@ -27,12 +27,15 @@ func (h *Handler) Start() {
 	log.Printf("HTTP handler running at %s:%d\n", h.Addr, h.Port)
 	r := mux.NewRouter()
 
-	router := MakeRouter(h.Db)
+	usrController := MakeUserController(h.Db, MakeRouter())
 
-	r.HandleFunc("/", router.HandleRoot).Methods("GET")
-	r.HandleFunc("/health", router.HandleHealth).Methods("GET")
+	r.HandleFunc("/register", usrController.HandleRegistration).Methods("POST")
+	r.HandleFunc("/login", usrController.HandleLogin).Methods("POST")
 
-	r.HandleFunc("/register", router.HandleRegistration).Methods("POST")
+	authRouter := r.PathPrefix("/").Subrouter()
+	authRouter.Use(AuthMiddleware)
+
+	authRouter.HandleFunc("/me", usrController.HandleMe).Methods("GET")
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", h.Addr, h.Port),

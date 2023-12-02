@@ -16,7 +16,7 @@ database:
 
 .PHONY: api
 api:
-	docker exec -it money_keeper_api bash
+	docker exec -it money_keeper_api sh
 
 .PHONY: logs
 logs:

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS skeletons (
     currency ENUM('BRL', 'USD') DEFAULT 'BRL',
     plan_id INT NOT NULL,
     user_id INT NOT NULL,
-    CONSTRAINT fk_skeletons_plan_id FOREIGN KEY (plan_id) REFERENCES skeleton_plans(id)
+    CONSTRAINT fk_skeletons_plan_id FOREIGN KEY (plan_id) REFERENCES plans(id)
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
     CONSTRAINT fk_skeletons_user_id FOREIGN KEY (user_id) REFERENCES users(id)

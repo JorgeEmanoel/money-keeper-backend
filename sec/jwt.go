@@ -1,7 +1,6 @@
 package sec
 
 import (
-	"crypto/rsa"
 	"errors"
 	"fmt"
 	"log"
@@ -10,22 +9,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 )
-
-func getPrivateKeyFromFile() (*rsa.PrivateKey, error) {
-	privateKey, err := os.ReadFile(os.Getenv("JWT_KEY_FILE"))
-	if err != nil {
-		log.Printf("Failed to load JWT_KEY_FILE: %s", os.Getenv("JWT_KEY_FILE"))
-		return nil, err
-	}
-
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
-	if err != nil {
-		log.Printf("error parsing RSA private key: %v\n", err)
-		return nil, err
-	}
-
-	return key, nil
-}
 
 func getHMACSecret() []byte {
 	return []byte(os.Getenv("JWT_HMAC_SECRET"))
@@ -57,8 +40,6 @@ func JWTToPayload(tokenString string) (map[string]any, error) {
 	privateKey := getHMACSecret()
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		log.Printf("Method: %v", token.Method)
-		log.Printf("privateKey: %v", privateKey)
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

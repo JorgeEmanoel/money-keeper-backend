@@ -24,10 +24,6 @@ func MakeUserController(db *sql.DB, r *Router) *UserController {
 	}
 }
 
-func makeResponseMessage(message string) map[string]string {
-	return map[string]string{"message": message}
-}
-
 type UserJson struct {
 	Id    int    `json:"id"`
 	Name  string `json:"name"`

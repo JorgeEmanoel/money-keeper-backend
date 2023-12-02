@@ -13,7 +13,6 @@ import (
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		jwt := req.Header.Get("Authorization")
-		log.Printf("Token: %s", jwt)
 
 		if len(jwt) < 1 {
 			w.WriteHeader(http.StatusUnauthorized)

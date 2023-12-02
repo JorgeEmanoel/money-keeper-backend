@@ -4,7 +4,7 @@ users
     email
     password
 
-skeleton_plans
+plans
     id
     name
     description

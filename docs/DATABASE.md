@@ -15,7 +15,7 @@ skeletons
     id
     name
     description
-    type (income, outcome)
+    direction (income, outcome)
     frequency (monthly, anual, random)
     value
     currency
@@ -26,7 +26,7 @@ transactions
     id
     name
     description
-    type (income, outcome)
+    direction (income, outcome)
     value
     currency
     reference (MONTH-YEAR)

@@ -51,6 +51,30 @@ func (h *Handler) Start() {
 	planRouter.HandleFunc("/{id}", planController.HandleDelete).Methods(http.MethodDelete)
 	planRouter.HandleFunc("", planController.HandleCreate).Methods(http.MethodPost)
 
+	skeletonRouter := r.PathPrefix("/plans/{planId}/skeletons").Subrouter()
+	skeletonRouter.Use(AuthMiddleware)
+
+	skeletonController := MakeSkeletonController(
+		plan.MakeSkeletonRepository(h.Db),
+		baseRouter,
+	)
+
+	skeletonRouter.HandleFunc("", skeletonController.HandleList).Methods(http.MethodGet)
+	skeletonRouter.HandleFunc("/{id}", skeletonController.HandleDelete).Methods(http.MethodDelete)
+	skeletonRouter.HandleFunc("", skeletonController.HandleCreate).Methods(http.MethodPost)
+
+	transactionRouter := r.PathPrefix("/transactions").Subrouter()
+	transactionRouter.Use(AuthMiddleware)
+
+	transactionsController := MakeTransactionController(
+		plan.MakeTransactionRepository(h.Db),
+		baseRouter,
+	)
+
+	transactionRouter.HandleFunc("/", transactionsController.HandleList).Methods(http.MethodGet)
+	transactionRouter.HandleFunc("/{id}/status/{status}", transactionsController.HandleChangeStatus).Methods(http.MethodPut)
+	transactionRouter.HandleFunc("/{id}", transactionsController.HandleDelete).Methods(http.MethodDelete)
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", h.Addr, h.Port),
 		Handler: r,

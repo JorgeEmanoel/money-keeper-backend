@@ -63,13 +63,13 @@ func (c *PlanController) HandleList(w http.ResponseWriter, req *http.Request) {
 	c.r.json(w, response, http.StatusOK)
 }
 
-type CreateBody struct {
+type CreatePlanBody struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
 func (c *PlanController) HandleCreate(w http.ResponseWriter, req *http.Request) {
-	var body CreateBody
+	var body CreatePlanBody
 
 	err := json.NewDecoder(req.Body).Decode(&body)
 	if err != nil {

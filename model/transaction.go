@@ -1,11 +1,12 @@
 package model
 
-type Skeleton struct {
+type Transaction struct {
 	Id          int
 	Name        string
 	Description string
 	Direction   string
-	Frequency   string
 	Value       int
 	Currency    string
+	Reference   string
+	Status      string
 }

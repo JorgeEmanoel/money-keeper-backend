@@ -31,9 +31,10 @@ type UserJson struct {
 }
 
 type RegistrationBody struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name                 string `json:"name"`
+	Email                string `json:"email"`
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"passwordConfirmation"`
 }
 
 func (u *UserController) HandleRegistration(w http.ResponseWriter, req *http.Request) {
@@ -42,6 +43,7 @@ func (u *UserController) HandleRegistration(w http.ResponseWriter, req *http.Req
 	err := json.NewDecoder(req.Body).Decode(&body)
 	if err != nil {
 		u.r.json(w, map[string]string{"message": err.Error()}, http.StatusBadRequest)
+		return
 	}
 
 	if len(body.Email) < 1 {
@@ -58,6 +60,11 @@ func (u *UserController) HandleRegistration(w http.ResponseWriter, req *http.Req
 
 	if passwordLenth < 8 {
 		u.r.json(w, map[string]string{"message": "Your password must have at least 8 characters"}, http.StatusBadRequest)
+		return
+	}
+
+	if body.Password != body.PasswordConfirmation {
+		u.r.json(w, map[string]string{"message": "The password and password confirmation do not match"}, http.StatusBadRequest)
 		return
 	}
 

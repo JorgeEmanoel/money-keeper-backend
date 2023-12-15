@@ -14,6 +14,7 @@ func MakeRouter() *Router {
 
 func (r *Router) json(w http.ResponseWriter, data any, code int) {
 	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(code)
 	jsonData, err := json.Marshal(data)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/JorgeEmanoel/money-keeper-backend/plan"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -75,10 +76,12 @@ func (h *Handler) Start() {
 	transactionRouter.HandleFunc("/{id}/status/{status}", transactionsController.HandleChangeStatus).Methods(http.MethodPut)
 	transactionRouter.HandleFunc("/{id}", transactionsController.HandleDelete).Methods(http.MethodDelete)
 
-	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", h.Addr, h.Port),
-		Handler: r,
-	}
+	allowedMethods := handlers.AllowedMethods([]string{"OPTIONS", "GET", "PATCH", "PUT", "POST", "DELETE"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Accept", "Authorization"})
 
-	srv.ListenAndServe()
+	http.ListenAndServe(
+		fmt.Sprintf("%s:%d", h.Addr, h.Port),
+		handlers.CORS(allowedOrigins, allowedHeaders, allowedMethods)(r),
+	)
 }

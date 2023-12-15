@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS skeletons (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(200) NOT NULL,
-    type ENUM('income', 'outcome') NOT NULL,
+    direction ENUM('income', 'outcome') NOT NULL,
     frequency ENUM('monthly', 'random'),
     value INT NOT NULL,
     currency ENUM('BRL', 'USD') DEFAULT 'BRL',

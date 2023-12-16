@@ -19,6 +19,7 @@ skeletons
     frequency (monthly, anual, random)
     value
     currency
+    created_at
     plan_id
     user_id
 
@@ -32,3 +33,5 @@ transactions
     reference (MONTH-YEAR)
     status (PENDING, PAID, CANCELED)
     user_id
+    created_at
+    updated_at

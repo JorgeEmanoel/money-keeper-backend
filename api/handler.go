@@ -30,7 +30,9 @@ func (h *Handler) Start() {
 	r := mux.NewRouter()
 	baseRouter := MakeRouter()
 
-	usrController := MakeUserController(h.Db, baseRouter)
+	planRepository := plan.MakePlanRepository(h.Db)
+
+	usrController := MakeUserController(h.Db, baseRouter, planRepository)
 
 	r.HandleFunc("/register", usrController.HandleRegistration).Methods(http.MethodPost)
 	r.HandleFunc("/login", usrController.HandleLogin).Methods(http.MethodPost)
@@ -44,7 +46,7 @@ func (h *Handler) Start() {
 	planRouter.Use(AuthMiddleware)
 
 	planController := MakePlanController(
-		plan.MakePlanRepository(h.Db),
+		planRepository,
 		baseRouter,
 	)
 

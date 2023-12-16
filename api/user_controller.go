@@ -13,14 +13,16 @@ import (
 )
 
 type UserController struct {
-	Db *sql.DB
-	r  *Router
+	Db       *sql.DB
+	r        *Router
+	planRepo PlanRepository
 }
 
-func MakeUserController(db *sql.DB, r *Router) *UserController {
+func MakeUserController(db *sql.DB, r *Router, planRepo PlanRepository) *UserController {
 	return &UserController{
-		Db: db,
-		r:  r,
+		Db:       db,
+		r:        r,
+		planRepo: planRepo,
 	}
 }
 
@@ -93,6 +95,8 @@ func (u *UserController) HandleRegistration(w http.ResponseWriter, req *http.Req
 		u.r.json(w, map[string]string{}, http.StatusInternalServerError)
 	}
 
+	u.planRepo.Store("Default Plan", "Your default plan", "enabled", int(id))
+
 	u.r.json(w, map[string]string{"id": fmt.Sprintf("%d", id)}, http.StatusCreated)
 }
 
@@ -121,7 +125,7 @@ func (u *UserController) HandleLogin(w http.ResponseWriter, req *http.Request) {
 
 	result := u.Db.QueryRow("SELECT id, password FROM users WHERE email = ?", body.Email)
 
-	if result == nil {
+	if result.Err() != nil {
 		u.r.json(w, map[string]string{"message": "Invalid e-mail or password"}, http.StatusBadRequest)
 		return
 	}

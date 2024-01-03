@@ -63,6 +63,8 @@ func (h *Handler) Start() {
 	)
 
 	skeletonRouter.HandleFunc("", skeletonController.HandleList).Methods(http.MethodGet)
+	skeletonRouter.HandleFunc("/incoming", skeletonController.HandleIncomingList).Methods(http.MethodGet)
+	skeletonRouter.HandleFunc("/outcoming", skeletonController.HandleOutocomingList).Methods(http.MethodGet)
 	skeletonRouter.HandleFunc("/{id}", skeletonController.HandleDelete).Methods(http.MethodDelete)
 	skeletonRouter.HandleFunc("", skeletonController.HandleCreate).Methods(http.MethodPost)
 

@@ -14,6 +14,8 @@ type SkeletonRepository interface {
 	Store(name, description, direction, frequency, currency string, value, planId, ownerId int) (int, error)
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Skeleton, error)
+	GetIncomingsByUserId(userId int) ([]model.Skeleton, error)
+	GetOutcomingsByUserId(userId int) ([]model.Skeleton, error)
 }
 
 type SkeletonController struct {
@@ -69,6 +71,70 @@ func (c *SkeletonController) HandleList(w http.ResponseWriter, req *http.Request
 	c.r.json(w, response, http.StatusOK)
 }
 
+func (c *SkeletonController) HandleIncomingList(w http.ResponseWriter, req *http.Request) {
+	skeletons, err := c.repo.GetIncomingsByUserId(req.Context().Value("user.id").(int))
+	if err != nil {
+		log.Printf("Failed to fetch user skeletons. User Id: %d, err: %v", req.Context().Value("user.id"), err)
+		c.r.json(w, map[string]string{"message": "Failed to fetch skeletons. Please, try again later"}, http.StatusInternalServerError)
+		return
+	}
+
+	var skeletonsResponse []SkeletonJson
+
+	for _, skeleton := range skeletons {
+		p := SkeletonJson{
+			Id:          skeleton.Id,
+			Name:        skeleton.Name,
+			Description: skeleton.Description,
+			Direction:   skeleton.Direction,
+			Frequency:   skeleton.Frequency,
+			Value:       skeleton.Value,
+			Currency:    skeleton.Currency,
+		}
+
+		skeletonsResponse = append(skeletonsResponse, p)
+	}
+
+	response := map[string][]SkeletonJson{
+		"skeletons": skeletonsResponse,
+	}
+
+	log.Println(response)
+
+	c.r.json(w, response, http.StatusOK)
+}
+
+func (c *SkeletonController) HandleOutocomingList(w http.ResponseWriter, req *http.Request) {
+	skeletons, err := c.repo.GetOutcomingsByUserId(req.Context().Value("user.id").(int))
+	if err != nil {
+		log.Printf("Failed to fetch user skeletons. User Id: %d, err: %v", req.Context().Value("user.id"), err)
+		c.r.json(w, map[string]string{"message": "Failed to fetch skeletons. Please, try again later"}, http.StatusInternalServerError)
+		return
+	}
+
+	var skeletonsResponse []SkeletonJson
+
+	for _, skeleton := range skeletons {
+		p := SkeletonJson{
+			Id:          skeleton.Id,
+			Name:        skeleton.Name,
+			Description: skeleton.Description,
+			Direction:   skeleton.Direction,
+			Frequency:   skeleton.Frequency,
+			Value:       skeleton.Value,
+			Currency:    skeleton.Currency,
+		}
+
+		skeletonsResponse = append(skeletonsResponse, p)
+	}
+
+	response := map[string][]SkeletonJson{
+		"skeletons": skeletonsResponse,
+	}
+
+	c.r.json(w, response, http.StatusOK)
+}
+
 type CreateSkeletonBody struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -85,6 +151,7 @@ func (c *SkeletonController) HandleCreate(w http.ResponseWriter, req *http.Reque
 	err := json.NewDecoder(req.Body).Decode(&body)
 	if err != nil {
 		c.r.json(w, map[string]string{"message": err.Error()}, http.StatusBadRequest)
+		return
 	}
 
 	id, err := c.repo.Store(

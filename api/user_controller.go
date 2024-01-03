@@ -26,12 +26,6 @@ func MakeUserController(db *sql.DB, r *Router, planRepo PlanRepository) *UserCon
 	}
 }
 
-type UserJson struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 type RegistrationBody struct {
 	Name                 string `json:"name"`
 	Email                string `json:"email"`
@@ -158,6 +152,13 @@ func (u *UserController) HandleLogin(w http.ResponseWriter, req *http.Request) {
 	u.r.json(w, map[string]string{"token": jwt}, http.StatusOK)
 }
 
+type UserJson struct {
+	Id            int    `json:"id"`
+	Name          string `json:"name"`
+	Email         string `json:"email"`
+	CurrentPlanId int    `json:"currentPlanId"`
+}
+
 func (u *UserController) HandleMe(w http.ResponseWriter, req *http.Request) {
 	userId := req.Context().Value("user.id")
 
@@ -170,6 +171,9 @@ func (u *UserController) HandleMe(w http.ResponseWriter, req *http.Request) {
 
 	var user UserJson
 	result.Scan(&user.Id, &user.Name, &user.Email)
+
+	result = u.Db.QueryRow("SELECT id FROM plans WHERE user_id = ? LIMIT 1", userId)
+	result.Scan(&user.CurrentPlanId)
 
 	u.r.json(w, user, http.StatusOK)
 }

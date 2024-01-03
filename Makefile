@@ -14,6 +14,9 @@ clean: down
 database:
 	docker exec -it money_keeper_database mysql -u root -proot money_keeper
 
+.PHONY: db
+db: database
+
 .PHONY: api
 api:
 	docker exec -it money_keeper_api sh

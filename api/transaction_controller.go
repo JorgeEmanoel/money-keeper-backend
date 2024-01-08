@@ -20,6 +20,9 @@ type TransactionRepository interface {
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Transaction, error)
 	ChangeStatus(id int, status string) error
+	GetByUserIdFromReference(userId int, reference string) ([]model.Transaction, error)
+	GetOutcomingByUserId(userId int) ([]model.Transaction, error)
+	GetIncomingByUserId(userId int) ([]model.Transaction, error)
 }
 
 type TransactionController struct {
@@ -62,7 +65,71 @@ func (c *TransactionController) HandleList(w http.ResponseWriter, req *http.Requ
 			Description: transaction.Description,
 			Direction:   transaction.Direction,
 			Reference:   transaction.Reference,
-			Value:       transaction.Value,
+			Value:       transaction.Value / 100,
+			Currency:    transaction.Currency,
+			Status:      transaction.Status,
+		}
+
+		transactionsResponse = append(transactionsResponse, p)
+	}
+
+	response := map[string][]TransactionJson{
+		"transactions": transactionsResponse,
+	}
+
+	c.r.json(w, response, http.StatusOK)
+}
+
+func (c *TransactionController) HandleOutcomingList(w http.ResponseWriter, req *http.Request) {
+	transactions, err := c.repo.GetOutcomingByUserId(req.Context().Value("user.id").(int))
+	if err != nil {
+		log.Printf("Failed to fetch user transactions. User Id: %d, err: %v", req.Context().Value("user.id"), err)
+		c.r.json(w, map[string]string{"message": "Failed to fetch transactions. Please, try again later"}, http.StatusInternalServerError)
+		return
+	}
+
+	var transactionsResponse []TransactionJson
+
+	for _, transaction := range transactions {
+		p := TransactionJson{
+			Id:          transaction.Id,
+			Name:        transaction.Name,
+			Description: transaction.Description,
+			Direction:   transaction.Direction,
+			Reference:   transaction.Reference,
+			Value:       transaction.Value / 100,
+			Currency:    transaction.Currency,
+			Status:      transaction.Status,
+		}
+
+		transactionsResponse = append(transactionsResponse, p)
+	}
+
+	response := map[string][]TransactionJson{
+		"transactions": transactionsResponse,
+	}
+
+	c.r.json(w, response, http.StatusOK)
+}
+
+func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *http.Request) {
+	transactions, err := c.repo.GetIncomingByUserId(req.Context().Value("user.id").(int))
+	if err != nil {
+		log.Printf("Failed to fetch user transactions. User Id: %d, err: %v", req.Context().Value("user.id"), err)
+		c.r.json(w, map[string]string{"message": "Failed to fetch transactions. Please, try again later"}, http.StatusInternalServerError)
+		return
+	}
+
+	var transactionsResponse []TransactionJson
+
+	for _, transaction := range transactions {
+		p := TransactionJson{
+			Id:          transaction.Id,
+			Name:        transaction.Name,
+			Description: transaction.Description,
+			Direction:   transaction.Direction,
+			Reference:   transaction.Reference,
+			Value:       transaction.Value / 100,
 			Currency:    transaction.Currency,
 			Status:      transaction.Status,
 		}

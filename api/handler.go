@@ -47,10 +47,12 @@ func (h *Handler) Start() {
 
 	planController := MakePlanController(
 		planRepository,
+		plan.MakeTransactionRepository(h.Db),
 		baseRouter,
 	)
 
 	planRouter.HandleFunc("", planController.HandleList).Methods(http.MethodGet)
+	planRouter.HandleFunc("/summary/{reference}", planController.HandleSummary).Methods(http.MethodGet)
 	planRouter.HandleFunc("/{id}", planController.HandleDelete).Methods(http.MethodDelete)
 	planRouter.HandleFunc("", planController.HandleCreate).Methods(http.MethodPost)
 
@@ -77,6 +79,7 @@ func (h *Handler) Start() {
 	)
 
 	transactionRouter.HandleFunc("/", transactionsController.HandleList).Methods(http.MethodGet)
+	transactionRouter.HandleFunc("/outcoming", transactionsController.HandleOutcomingList).Methods(http.MethodGet)
 	transactionRouter.HandleFunc("/{id}/status/{status}", transactionsController.HandleChangeStatus).Methods(http.MethodPut)
 	transactionRouter.HandleFunc("/{id}", transactionsController.HandleDelete).Methods(http.MethodDelete)
 

@@ -67,6 +67,42 @@ func (r *TransactionRepository) GetByUserId(userId int) ([]model.Transaction, er
 	return transactions, nil
 }
 
+func (r *TransactionRepository) GetOutcomingByUserId(userId int) ([]model.Transaction, error) {
+	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'outcoming'", userId)
+	if err != nil {
+		return []model.Transaction{}, err
+	}
+
+	var transactions []model.Transaction
+
+	for result.Next() {
+		var s model.Transaction
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+
+		transactions = append(transactions, s)
+	}
+
+	return transactions, nil
+}
+
+func (r *TransactionRepository) GetIncomingByUserId(userId int) ([]model.Transaction, error) {
+	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'incoming'", userId)
+	if err != nil {
+		return []model.Transaction{}, err
+	}
+
+	var transactions []model.Transaction
+
+	for result.Next() {
+		var s model.Transaction
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+
+		transactions = append(transactions, s)
+	}
+
+	return transactions, nil
+}
+
 func (r *TransactionRepository) ChangeStatus(id int, status string) error {
 	_, err := r.Db.Exec("UPDATE transactions SET status = ? WHERE id = ?", status, id)
 	if err != nil {
@@ -74,4 +110,22 @@ func (r *TransactionRepository) ChangeStatus(id int, status string) error {
 	}
 
 	return nil
+}
+
+func (r *TransactionRepository) GetByUserIdFromReference(userId int, reference string) ([]model.Transaction, error) {
+	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND reference = ?", userId, reference)
+	if err != nil {
+		return []model.Transaction{}, err
+	}
+
+	var transactions []model.Transaction
+
+	for result.Next() {
+		var s model.Transaction
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+
+		transactions = append(transactions, s)
+	}
+
+	return transactions, nil
 }

@@ -17,14 +17,16 @@ type PlanRepository interface {
 }
 
 type PlanController struct {
-	repo PlanRepository
-	r    *Router
+	repo            PlanRepository
+	transactionRepo TransactionRepository
+	r               *Router
 }
 
-func MakePlanController(repo PlanRepository, r *Router) *PlanController {
+func MakePlanController(repo PlanRepository, transactionRepo TransactionRepository, r *Router) *PlanController {
 	return &PlanController{
-		repo: repo,
-		r:    r,
+		repo:            repo,
+		transactionRepo: transactionRepo,
+		r:               r,
 	}
 }
 
@@ -99,4 +101,40 @@ func (c *PlanController) HandleDelete(w http.ResponseWriter, req *http.Request) 
 	}
 
 	c.r.json(w, map[string]any{}, http.StatusOK)
+}
+
+func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request) {
+	reference := mux.Vars(req)["reference"]
+
+	transactions, err := c.transactionRepo.GetByUserIdFromReference(
+		req.Context().Value("user.id").(int),
+		reference,
+	)
+	if err != nil {
+		c.r.json(w, map[string]string{"message": "Failed to retrieve summary"}, http.StatusInternalServerError)
+		return
+	}
+
+	var (
+		totalIncomings  = 0
+		totalOutcomings = 0
+	)
+
+	for _, transaction := range transactions {
+		if transaction.Direction == "income" {
+			totalIncomings += transaction.Value
+		}
+
+		if transaction.Direction == "outcome" {
+			totalOutcomings += transaction.Value
+		}
+	}
+
+	balance := totalIncomings - totalOutcomings
+
+	c.r.json(w, map[string]any{
+		"totalIncomings":  totalIncomings / 100,
+		"totalOutcomings": totalOutcomings / 100,
+		"balance":         balance / 100,
+	}, http.StatusOK)
 }

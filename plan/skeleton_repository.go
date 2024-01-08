@@ -18,7 +18,7 @@ func MakeSkeletonRepository(db *sql.DB) *SkeletonRepository {
 }
 
 func (r *SkeletonRepository) Store(name, description, direction, frequency, currency string, value, planId, ownerId int) (int, error) {
-	result, err := r.Db.Exec("INSERT INTO skeletons (name, description, direction, frequency, value, currency, plan_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, frequency, value, currency, planId, ownerId)
+	result, err := r.Db.Exec("INSERT INTO skeletons (name, description, direction, frequency, value, currency, plan_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, frequency, value*100, currency, planId, ownerId)
 	if err != nil {
 		return 0, err
 	}
@@ -60,6 +60,7 @@ func (r *SkeletonRepository) GetByUserId(userId int) ([]model.Skeleton, error) {
 	for result.Next() {
 		var s model.Skeleton
 		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Frequency, &s.Value, &s.Currency)
+		s.Value = s.Value / 100
 
 		skeletons = append(skeletons, s)
 	}
@@ -78,6 +79,7 @@ func (r *SkeletonRepository) GetIncomingsByUserId(userId int) ([]model.Skeleton,
 	for result.Next() {
 		var s model.Skeleton
 		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Frequency, &s.Value, &s.Currency)
+		s.Value = s.Value / 100
 
 		skeletons = append(skeletons, s)
 	}
@@ -96,6 +98,7 @@ func (r *SkeletonRepository) GetOutcomingsByUserId(userId int) ([]model.Skeleton
 	for result.Next() {
 		var s model.Skeleton
 		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Frequency, &s.Value, &s.Currency)
+		s.Value = s.Value / 100
 
 		skeletons = append(skeletons, s)
 	}

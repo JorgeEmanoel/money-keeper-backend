@@ -131,6 +131,7 @@ func (u *UserController) HandleLogin(w http.ResponseWriter, req *http.Request) {
 	err = result.Scan(&id, &password)
 
 	if err != nil {
+		log.Println(err)
 		u.r.json(w, map[string]string{"message": "Internal error. Please, try again later"}, http.StatusInternalServerError)
 		return
 	}

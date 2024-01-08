@@ -49,6 +49,7 @@ func (c *SkeletonController) HandleList(w http.ResponseWriter, req *http.Request
 	}
 
 	var skeletonsResponse []SkeletonJson
+	total := 0
 
 	for _, skeleton := range skeletons {
 		p := SkeletonJson{
@@ -62,10 +63,12 @@ func (c *SkeletonController) HandleList(w http.ResponseWriter, req *http.Request
 		}
 
 		skeletonsResponse = append(skeletonsResponse, p)
+		total += skeleton.Value
 	}
 
-	response := map[string][]SkeletonJson{
+	response := map[string]any{
 		"skeletons": skeletonsResponse,
+		"total":     total,
 	}
 
 	c.r.json(w, response, http.StatusOK)
@@ -80,6 +83,7 @@ func (c *SkeletonController) HandleIncomingList(w http.ResponseWriter, req *http
 	}
 
 	var skeletonsResponse []SkeletonJson
+	total := 0
 
 	for _, skeleton := range skeletons {
 		p := SkeletonJson{
@@ -93,13 +97,13 @@ func (c *SkeletonController) HandleIncomingList(w http.ResponseWriter, req *http
 		}
 
 		skeletonsResponse = append(skeletonsResponse, p)
+		total += skeleton.Value
 	}
 
-	response := map[string][]SkeletonJson{
+	response := map[string]any{
 		"skeletons": skeletonsResponse,
+		"total":     total,
 	}
-
-	log.Println(response)
 
 	c.r.json(w, response, http.StatusOK)
 }
@@ -113,6 +117,7 @@ func (c *SkeletonController) HandleOutocomingList(w http.ResponseWriter, req *ht
 	}
 
 	var skeletonsResponse []SkeletonJson
+	total := 0
 
 	for _, skeleton := range skeletons {
 		p := SkeletonJson{
@@ -126,10 +131,12 @@ func (c *SkeletonController) HandleOutocomingList(w http.ResponseWriter, req *ht
 		}
 
 		skeletonsResponse = append(skeletonsResponse, p)
+		total += skeleton.Value
 	}
 
-	response := map[string][]SkeletonJson{
+	response := map[string]any{
 		"skeletons": skeletonsResponse,
+		"total":     total,
 	}
 
 	c.r.json(w, response, http.StatusOK)

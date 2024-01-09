@@ -3,7 +3,6 @@ package plan
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/JorgeEmanoel/money-keeper-backend/model"
 )
@@ -133,7 +132,6 @@ func (r *TransactionRepository) GetByUserIdFromPeriod(userId int, period string)
 }
 
 func (r *TransactionRepository) CountByUserIdFromPeriod(userId int, period string) (int, error) {
-	log.Printf("CountByUserIdFromPeriod: userId: %d, period: %s", userId, period)
 	var total int
 
 	stmt, _ := r.Db.Prepare("SELECT COUNT(*) FROM transactions WHERE user_id = ? AND period = ?")
@@ -141,8 +139,6 @@ func (r *TransactionRepository) CountByUserIdFromPeriod(userId int, period strin
 	if err != nil {
 		return 0, err
 	}
-
-	log.Printf("CountByUserIdFromPeriod: total: %d", total)
 
 	return total, nil
 }

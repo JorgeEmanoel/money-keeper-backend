@@ -16,11 +16,12 @@ var (
 )
 
 type TransactionRepository interface {
-	Store(name, description, direction, reference, currency, status string, value, planId, ownerId int) (int, error)
+	Store(name, description, direction, reference, currency, status string, value, ownerId int) (int, error)
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Transaction, error)
 	ChangeStatus(id int, status string) error
 	GetByUserIdFromReference(userId int, reference string) ([]model.Transaction, error)
+	CountByUserIdFromReference(userId int, reference string) (int, error)
 	GetOutcomingByUserId(userId int) ([]model.Transaction, error)
 	GetIncomingByUserId(userId int) ([]model.Transaction, error)
 }

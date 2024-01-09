@@ -63,3 +63,15 @@ func (r *PlanRepository) GetByUserId(userId int) ([]model.Plan, error) {
 
 	return plans, nil
 }
+
+func (r *PlanRepository) FirstByUserId(userId int) (model.Plan, error) {
+	result, err := r.Db.Query("SELECT id, name, description, status FROM plans WHERE user_id = ? LIMIT 1", userId)
+	if err != nil {
+		return model.Plan{}, err
+	}
+
+	var plan model.Plan
+	result.Scan(&plan.Id, &plan.Name, &plan.Description, &plan.Status)
+
+	return plan, nil
+}

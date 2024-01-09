@@ -14,18 +14,21 @@ type PlanRepository interface {
 	Store(name, description, status string, ownerId int) (int, error)
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Plan, error)
+	FirstByUserId(userId int) (model.Plan, error)
 }
 
 type PlanController struct {
 	repo            PlanRepository
 	transactionRepo TransactionRepository
+	skeletonRepo    SkeletonRepository
 	r               *Router
 }
 
-func MakePlanController(repo PlanRepository, transactionRepo TransactionRepository, r *Router) *PlanController {
+func MakePlanController(repo PlanRepository, transactionRepo TransactionRepository, skeletonRepo SkeletonRepository, r *Router) *PlanController {
 	return &PlanController{
 		repo:            repo,
 		transactionRepo: transactionRepo,
+		skeletonRepo:    skeletonRepo,
 		r:               r,
 	}
 }
@@ -132,9 +135,67 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 
 	balance := totalIncomings - totalOutcomings
 
+	transactionsCount, err := c.transactionRepo.CountByUserIdFromReference(
+		req.Context().Value("user.id").(int),
+		reference,
+	)
+
+	status := "pending"
+
+	if transactionsCount > 0 && err != nil {
+		status = "initiated"
+	}
+
 	c.r.json(w, map[string]any{
 		"totalIncomings":  totalIncomings / 100,
 		"totalOutcomings": totalOutcomings / 100,
 		"balance":         balance / 100,
+		"initStatus":      status,
 	}, http.StatusOK)
+}
+
+func (c *PlanController) HandleInit(w http.ResponseWriter, req *http.Request) {
+	reference := mux.Vars(req)["reference"]
+	userId := req.Context().Value("user.id").(int)
+
+	transactionsCount, err := c.transactionRepo.CountByUserIdFromReference(
+		userId,
+		reference,
+	)
+	if err != nil {
+		log.Printf("Failed to init plan. reference: %s, err: %v", reference, err)
+		c.r.json(w, map[string]any{"message": "Internal server error"}, http.StatusInternalServerError)
+		return
+	}
+
+	if transactionsCount > 0 {
+		c.r.json(w, map[string]any{"message": "Month already initiated"}, http.StatusUnprocessableEntity)
+		return
+	}
+
+	skeletons, err := c.skeletonRepo.GetByUserId(userId)
+	if err != nil {
+		log.Printf("Failed to retrieve skeletons. userId: %d, reference: %s", userId, reference)
+		c.r.json(w, map[string]any{"message": "Failed to retrieve skeletons"}, http.StatusInternalServerError)
+		return
+	}
+
+	for _, skeleton := range skeletons {
+		_, err := c.transactionRepo.Store(
+			skeleton.Name,
+			skeleton.Description,
+			skeleton.Direction,
+			reference,
+			skeleton.Currency,
+			"pending",
+			skeleton.Value,
+			userId,
+		)
+		if err != nil {
+			log.Printf("Faled to store transaction. userId: %d, reference: %s, err: %v", userId, reference, err)
+			break
+		}
+	}
+
+	c.r.json(w, map[string]any{}, http.StatusCreated)
 }

@@ -48,11 +48,13 @@ func (h *Handler) Start() {
 	planController := MakePlanController(
 		planRepository,
 		plan.MakeTransactionRepository(h.Db),
+		plan.MakeSkeletonRepository(h.Db),
 		baseRouter,
 	)
 
 	planRouter.HandleFunc("", planController.HandleList).Methods(http.MethodGet)
 	planRouter.HandleFunc("/summary/{reference}", planController.HandleSummary).Methods(http.MethodGet)
+	planRouter.HandleFunc("/init/{reference}", planController.HandleInit).Methods(http.MethodGet)
 	planRouter.HandleFunc("/{id}", planController.HandleDelete).Methods(http.MethodDelete)
 	planRouter.HandleFunc("", planController.HandleCreate).Methods(http.MethodPost)
 

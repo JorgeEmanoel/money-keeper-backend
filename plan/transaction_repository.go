@@ -17,8 +17,8 @@ func MakeTransactionRepository(db *sql.DB) *TransactionRepository {
 	}
 }
 
-func (r *TransactionRepository) Store(name, description, direction, reference, currency, status string, value, planId, ownerId int) (int, error) {
-	result, err := r.Db.Exec("INSERT INTO transactions (name, description, direction, reference, currency, status, value, plan_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, reference, currency, status, value, planId, ownerId)
+func (r *TransactionRepository) Store(name, description, direction, reference, currency, status string, value, ownerId int) (int, error) {
+	result, err := r.Db.Exec("INSERT INTO transactions (name, description, direction, reference, currency, status, value, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, reference, currency, status, value, ownerId)
 	if err != nil {
 		return 0, err
 	}
@@ -113,7 +113,7 @@ func (r *TransactionRepository) ChangeStatus(id int, status string) error {
 }
 
 func (r *TransactionRepository) GetByUserIdFromReference(userId int, reference string) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND reference = ?", userId, reference)
+	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND reference = '?'", userId, reference)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -128,4 +128,17 @@ func (r *TransactionRepository) GetByUserIdFromReference(userId int, reference s
 	}
 
 	return transactions, nil
+}
+
+func (r *TransactionRepository) CountByUserIdFromReference(userId int, reference string) (int, error) {
+	result, err := r.Db.Query("SELECT count(*) as total FROM transactions WHERE user_id = ? AND reference = '?'", userId, reference)
+	if err != nil {
+		return 0, err
+	}
+
+	total := 0
+
+	result.Scan(&total)
+
+	return total, nil
 }

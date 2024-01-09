@@ -58,7 +58,7 @@ func (c *SkeletonController) HandleList(w http.ResponseWriter, req *http.Request
 			Description: skeleton.Description,
 			Direction:   skeleton.Direction,
 			Frequency:   skeleton.Frequency,
-			Value:       skeleton.Value,
+			Value:       skeleton.Value / 100,
 			Currency:    skeleton.Currency,
 		}
 
@@ -92,7 +92,7 @@ func (c *SkeletonController) HandleIncomingList(w http.ResponseWriter, req *http
 			Description: skeleton.Description,
 			Direction:   skeleton.Direction,
 			Frequency:   skeleton.Frequency,
-			Value:       skeleton.Value,
+			Value:       skeleton.Value / 100,
 			Currency:    skeleton.Currency,
 		}
 
@@ -126,7 +126,7 @@ func (c *SkeletonController) HandleOutocomingList(w http.ResponseWriter, req *ht
 			Description: skeleton.Description,
 			Direction:   skeleton.Direction,
 			Frequency:   skeleton.Frequency,
-			Value:       skeleton.Value,
+			Value:       skeleton.Value / 100,
 			Currency:    skeleton.Currency,
 		}
 

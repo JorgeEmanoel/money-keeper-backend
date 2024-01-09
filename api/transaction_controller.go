@@ -22,8 +22,8 @@ type TransactionRepository interface {
 	ChangeStatus(id int, status string) error
 	GetByUserIdFromPeriod(userId int, period string) ([]model.Transaction, error)
 	CountByUserIdFromPeriod(userId int, period string) (int, error)
-	GetOutcomingByUserId(userId int) ([]model.Transaction, error)
-	GetIncomingByUserId(userId int) ([]model.Transaction, error)
+	GetOutcomingByUserId(userId int, period string) ([]model.Transaction, error)
+	GetIncomingByUserId(userId int, period string) ([]model.Transaction, error)
 }
 
 type TransactionController struct {
@@ -82,14 +82,17 @@ func (c *TransactionController) HandleList(w http.ResponseWriter, req *http.Requ
 }
 
 func (c *TransactionController) HandleOutcomingList(w http.ResponseWriter, req *http.Request) {
-	transactions, err := c.repo.GetOutcomingByUserId(req.Context().Value("user.id").(int))
+	period := mux.Vars(req)["period"]
+	transactions, err := c.repo.GetOutcomingByUserId(req.Context().Value("user.id").(int), period)
 	if err != nil {
 		log.Printf("Failed to fetch user transactions. User Id: %d, err: %v", req.Context().Value("user.id"), err)
 		c.r.json(w, map[string]string{"message": "Failed to fetch transactions. Please, try again later"}, http.StatusInternalServerError)
 		return
 	}
 
-	var transactionsResponse []TransactionJson
+	transactionsResponse := make([]TransactionJson, 0)
+	totalPending := 0
+	total := 0
 
 	for _, transaction := range transactions {
 		p := TransactionJson{
@@ -104,24 +107,35 @@ func (c *TransactionController) HandleOutcomingList(w http.ResponseWriter, req *
 		}
 
 		transactionsResponse = append(transactionsResponse, p)
+
+		if p.Status == "pending" {
+			totalPending += p.Value
+		}
+
+		total += p.Value
 	}
 
-	response := map[string][]TransactionJson{
+	response := map[string]any{
 		"transactions": transactionsResponse,
+		"totalPending": totalPending,
+		"total":        total,
 	}
 
 	c.r.json(w, response, http.StatusOK)
 }
 
 func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *http.Request) {
-	transactions, err := c.repo.GetIncomingByUserId(req.Context().Value("user.id").(int))
+	period := mux.Vars(req)["period"]
+	transactions, err := c.repo.GetIncomingByUserId(req.Context().Value("user.id").(int), period)
 	if err != nil {
 		log.Printf("Failed to fetch user transactions. User Id: %d, err: %v", req.Context().Value("user.id"), err)
 		c.r.json(w, map[string]string{"message": "Failed to fetch transactions. Please, try again later"}, http.StatusInternalServerError)
 		return
 	}
 
-	var transactionsResponse []TransactionJson
+	transactionsResponse := make([]TransactionJson, 0)
+	totalPending := 0
+	total := 0
 
 	for _, transaction := range transactions {
 		p := TransactionJson{
@@ -136,10 +150,18 @@ func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *h
 		}
 
 		transactionsResponse = append(transactionsResponse, p)
+
+		if p.Status == "pending" {
+			totalPending += p.Value
+		}
+
+		total += p.Value
 	}
 
-	response := map[string][]TransactionJson{
+	response := map[string]any{
 		"transactions": transactionsResponse,
+		"totalPending": totalPending,
+		"total":        total,
 	}
 
 	c.r.json(w, response, http.StatusOK)

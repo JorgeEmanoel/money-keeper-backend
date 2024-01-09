@@ -3,6 +3,7 @@ package plan
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/JorgeEmanoel/money-keeper-backend/model"
 )
@@ -67,8 +68,8 @@ func (r *TransactionRepository) GetByUserId(userId int) ([]model.Transaction, er
 	return transactions, nil
 }
 
-func (r *TransactionRepository) GetOutcomingByUserId(userId int) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'outcoming'", userId)
+func (r *TransactionRepository) GetOutcomingByUserId(userId int, period string) ([]model.Transaction, error) {
+	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'outcome' AND period = ?", userId, period)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -85,8 +86,8 @@ func (r *TransactionRepository) GetOutcomingByUserId(userId int) ([]model.Transa
 	return transactions, nil
 }
 
-func (r *TransactionRepository) GetIncomingByUserId(userId int) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'incoming'", userId)
+func (r *TransactionRepository) GetIncomingByUserId(userId int, period string) ([]model.Transaction, error) {
+	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'income' AND period = ?", userId, period)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -113,7 +114,8 @@ func (r *TransactionRepository) ChangeStatus(id int, status string) error {
 }
 
 func (r *TransactionRepository) GetByUserIdFromPeriod(userId int, period string) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND period = '?'", userId, period)
+	stmt, _ := r.Db.Prepare("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND period = ?")
+	result, err := stmt.Query(userId, period)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -131,14 +133,16 @@ func (r *TransactionRepository) GetByUserIdFromPeriod(userId int, period string)
 }
 
 func (r *TransactionRepository) CountByUserIdFromPeriod(userId int, period string) (int, error) {
-	result, err := r.Db.Query("SELECT count(*) as total FROM transactions WHERE user_id = ? AND period = '?'", userId, period)
+	log.Printf("CountByUserIdFromPeriod: userId: %d, period: %s", userId, period)
+	var total int
+
+	stmt, _ := r.Db.Prepare("SELECT COUNT(*) FROM transactions WHERE user_id = ? AND period = ?")
+	err := stmt.QueryRow(userId, period).Scan(&total)
 	if err != nil {
 		return 0, err
 	}
 
-	total := 0
-
-	result.Scan(&total)
+	log.Printf("CountByUserIdFromPeriod: total: %d", total)
 
 	return total, nil
 }

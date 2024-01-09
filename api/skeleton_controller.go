@@ -97,7 +97,7 @@ func (c *SkeletonController) HandleIncomingList(w http.ResponseWriter, req *http
 		}
 
 		skeletonsResponse = append(skeletonsResponse, p)
-		total += skeleton.Value
+		total += skeleton.Value / 100
 	}
 
 	response := map[string]any{
@@ -131,7 +131,7 @@ func (c *SkeletonController) HandleOutocomingList(w http.ResponseWriter, req *ht
 		}
 
 		skeletonsResponse = append(skeletonsResponse, p)
-		total += skeleton.Value
+		total += skeleton.Value / 100
 	}
 
 	response := map[string]any{

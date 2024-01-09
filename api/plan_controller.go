@@ -114,6 +114,7 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 		period,
 	)
 	if err != nil {
+		log.Printf("Failed to retrieve summary: %v", err)
 		c.r.json(w, map[string]string{"message": "Failed to retrieve summary"}, http.StatusInternalServerError)
 		return
 	}
@@ -135,14 +136,11 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 
 	balance := totalIncomings - totalOutcomings
 
-	transactionsCount, err := c.transactionRepo.CountByUserIdFromPeriod(
-		req.Context().Value("user.id").(int),
-		period,
-	)
+	transactionsCount := len(transactions)
 
 	status := "pending"
 
-	if transactionsCount > 0 && err != nil {
+	if transactionsCount > 0 {
 		status = "initiated"
 	}
 

@@ -81,7 +81,8 @@ func (h *Handler) Start() {
 	)
 
 	transactionRouter.HandleFunc("/", transactionsController.HandleList).Methods(http.MethodGet)
-	transactionRouter.HandleFunc("/outcoming", transactionsController.HandleOutcomingList).Methods(http.MethodGet)
+	transactionRouter.HandleFunc("/outcoming/{period}", transactionsController.HandleOutcomingList).Methods(http.MethodGet)
+	transactionRouter.HandleFunc("/incoming/{period}", transactionsController.HandleIncomingList).Methods(http.MethodGet)
 	transactionRouter.HandleFunc("/{id}/status/{status}", transactionsController.HandleChangeStatus).Methods(http.MethodPut)
 	transactionRouter.HandleFunc("/{id}", transactionsController.HandleDelete).Methods(http.MethodDelete)
 

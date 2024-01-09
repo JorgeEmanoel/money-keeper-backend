@@ -107,11 +107,11 @@ func (c *PlanController) HandleDelete(w http.ResponseWriter, req *http.Request) 
 }
 
 func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request) {
-	reference := mux.Vars(req)["reference"]
+	period := mux.Vars(req)["period"]
 
-	transactions, err := c.transactionRepo.GetByUserIdFromReference(
+	transactions, err := c.transactionRepo.GetByUserIdFromPeriod(
 		req.Context().Value("user.id").(int),
-		reference,
+		period,
 	)
 	if err != nil {
 		c.r.json(w, map[string]string{"message": "Failed to retrieve summary"}, http.StatusInternalServerError)
@@ -135,9 +135,9 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 
 	balance := totalIncomings - totalOutcomings
 
-	transactionsCount, err := c.transactionRepo.CountByUserIdFromReference(
+	transactionsCount, err := c.transactionRepo.CountByUserIdFromPeriod(
 		req.Context().Value("user.id").(int),
-		reference,
+		period,
 	)
 
 	status := "pending"
@@ -155,15 +155,15 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 }
 
 func (c *PlanController) HandleInit(w http.ResponseWriter, req *http.Request) {
-	reference := mux.Vars(req)["reference"]
+	period := mux.Vars(req)["period"]
 	userId := req.Context().Value("user.id").(int)
 
-	transactionsCount, err := c.transactionRepo.CountByUserIdFromReference(
+	transactionsCount, err := c.transactionRepo.CountByUserIdFromPeriod(
 		userId,
-		reference,
+		period,
 	)
 	if err != nil {
-		log.Printf("Failed to init plan. reference: %s, err: %v", reference, err)
+		log.Printf("Failed to init plan. period: %s, err: %v", period, err)
 		c.r.json(w, map[string]any{"message": "Internal server error"}, http.StatusInternalServerError)
 		return
 	}
@@ -175,7 +175,7 @@ func (c *PlanController) HandleInit(w http.ResponseWriter, req *http.Request) {
 
 	skeletons, err := c.skeletonRepo.GetByUserId(userId)
 	if err != nil {
-		log.Printf("Failed to retrieve skeletons. userId: %d, reference: %s", userId, reference)
+		log.Printf("Failed to retrieve skeletons. userId: %d, period: %s", userId, period)
 		c.r.json(w, map[string]any{"message": "Failed to retrieve skeletons"}, http.StatusInternalServerError)
 		return
 	}
@@ -185,14 +185,14 @@ func (c *PlanController) HandleInit(w http.ResponseWriter, req *http.Request) {
 			skeleton.Name,
 			skeleton.Description,
 			skeleton.Direction,
-			reference,
+			period,
 			skeleton.Currency,
 			"pending",
 			skeleton.Value,
 			userId,
 		)
 		if err != nil {
-			log.Printf("Faled to store transaction. userId: %d, reference: %s, err: %v", userId, reference, err)
+			log.Printf("Faled to store transaction. userId: %d, period: %s, err: %v", userId, period, err)
 			break
 		}
 	}

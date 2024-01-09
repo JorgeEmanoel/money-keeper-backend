@@ -16,12 +16,12 @@ var (
 )
 
 type TransactionRepository interface {
-	Store(name, description, direction, reference, currency, status string, value, ownerId int) (int, error)
+	Store(name, description, direction, period, currency, status string, value, ownerId int) (int, error)
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Transaction, error)
 	ChangeStatus(id int, status string) error
-	GetByUserIdFromReference(userId int, reference string) ([]model.Transaction, error)
-	CountByUserIdFromReference(userId int, reference string) (int, error)
+	GetByUserIdFromPeriod(userId int, period string) ([]model.Transaction, error)
+	CountByUserIdFromPeriod(userId int, period string) (int, error)
 	GetOutcomingByUserId(userId int) ([]model.Transaction, error)
 	GetIncomingByUserId(userId int) ([]model.Transaction, error)
 }
@@ -43,7 +43,7 @@ type TransactionJson struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Direction   string `json:"direction"`
-	Reference   string `json:"reference"`
+	Period      string `json:"period"`
 	Value       int    `json:"value"`
 	Currency    string `json:"currency"`
 	Status      string `json:"status"`
@@ -65,7 +65,7 @@ func (c *TransactionController) HandleList(w http.ResponseWriter, req *http.Requ
 			Name:        transaction.Name,
 			Description: transaction.Description,
 			Direction:   transaction.Direction,
-			Reference:   transaction.Reference,
+			Period:      transaction.Period,
 			Value:       transaction.Value / 100,
 			Currency:    transaction.Currency,
 			Status:      transaction.Status,
@@ -97,7 +97,7 @@ func (c *TransactionController) HandleOutcomingList(w http.ResponseWriter, req *
 			Name:        transaction.Name,
 			Description: transaction.Description,
 			Direction:   transaction.Direction,
-			Reference:   transaction.Reference,
+			Period:      transaction.Period,
 			Value:       transaction.Value / 100,
 			Currency:    transaction.Currency,
 			Status:      transaction.Status,
@@ -129,7 +129,7 @@ func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *h
 			Name:        transaction.Name,
 			Description: transaction.Description,
 			Direction:   transaction.Direction,
-			Reference:   transaction.Reference,
+			Period:      transaction.Period,
 			Value:       transaction.Value / 100,
 			Currency:    transaction.Currency,
 			Status:      transaction.Status,

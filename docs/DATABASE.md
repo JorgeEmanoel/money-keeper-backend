@@ -30,7 +30,7 @@ transactions
     direction (income, outcome)
     value
     currency
-    reference (MONTH-YEAR)
+    period (MONTH-YEAR)
     status (PENDING, PAID, CANCELED)
     user_id
     created_at

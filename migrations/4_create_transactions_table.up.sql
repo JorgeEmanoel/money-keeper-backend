@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     direction ENUM('income', 'outcome') NOT NULL,
     value INT NOT NULL,
     currency ENUM('BRL', 'USD') DEFAULT 'BRL',
-    reference CHAR(7),
+    period CHAR(7),
     status ENUM('pending', 'paid', 'canceled'),
     user_id INT NOT NULL,
     created_at TIMESTAMP default CURRENT_TIMESTAMP,

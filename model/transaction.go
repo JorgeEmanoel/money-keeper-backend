@@ -7,6 +7,6 @@ type Transaction struct {
 	Direction   string
 	Value       int
 	Currency    string
-	Reference   string
+	Period      string
 	Status      string
 }

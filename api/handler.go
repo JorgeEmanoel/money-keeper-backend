@@ -53,8 +53,8 @@ func (h *Handler) Start() {
 	)
 
 	planRouter.HandleFunc("", planController.HandleList).Methods(http.MethodGet)
-	planRouter.HandleFunc("/summary/{reference}", planController.HandleSummary).Methods(http.MethodGet)
-	planRouter.HandleFunc("/init/{reference}", planController.HandleInit).Methods(http.MethodGet)
+	planRouter.HandleFunc("/summary/{period}", planController.HandleSummary).Methods(http.MethodGet)
+	planRouter.HandleFunc("/init/{period}", planController.HandleInit).Methods(http.MethodGet)
 	planRouter.HandleFunc("/{id}", planController.HandleDelete).Methods(http.MethodDelete)
 	planRouter.HandleFunc("", planController.HandleCreate).Methods(http.MethodPost)
 

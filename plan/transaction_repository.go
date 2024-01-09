@@ -17,8 +17,8 @@ func MakeTransactionRepository(db *sql.DB) *TransactionRepository {
 	}
 }
 
-func (r *TransactionRepository) Store(name, description, direction, reference, currency, status string, value, ownerId int) (int, error) {
-	result, err := r.Db.Exec("INSERT INTO transactions (name, description, direction, reference, currency, status, value, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, reference, currency, status, value, ownerId)
+func (r *TransactionRepository) Store(name, description, direction, period, currency, status string, value, ownerId int) (int, error) {
+	result, err := r.Db.Exec("INSERT INTO transactions (name, description, direction, period, currency, status, value, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, period, currency, status, value, ownerId)
 	if err != nil {
 		return 0, err
 	}
@@ -50,7 +50,7 @@ func (r *TransactionRepository) Delete(id int) error {
 }
 
 func (r *TransactionRepository) GetByUserId(userId int) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ?", userId)
+	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ?", userId)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -59,7 +59,7 @@ func (r *TransactionRepository) GetByUserId(userId int) ([]model.Transaction, er
 
 	for result.Next() {
 		var s model.Transaction
-		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Period, &s.Currency, &s.Status, &s.Value)
 
 		transactions = append(transactions, s)
 	}
@@ -68,7 +68,7 @@ func (r *TransactionRepository) GetByUserId(userId int) ([]model.Transaction, er
 }
 
 func (r *TransactionRepository) GetOutcomingByUserId(userId int) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'outcoming'", userId)
+	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'outcoming'", userId)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -77,7 +77,7 @@ func (r *TransactionRepository) GetOutcomingByUserId(userId int) ([]model.Transa
 
 	for result.Next() {
 		var s model.Transaction
-		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Period, &s.Currency, &s.Status, &s.Value)
 
 		transactions = append(transactions, s)
 	}
@@ -86,7 +86,7 @@ func (r *TransactionRepository) GetOutcomingByUserId(userId int) ([]model.Transa
 }
 
 func (r *TransactionRepository) GetIncomingByUserId(userId int) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'incoming'", userId)
+	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND direction = 'incoming'", userId)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -95,7 +95,7 @@ func (r *TransactionRepository) GetIncomingByUserId(userId int) ([]model.Transac
 
 	for result.Next() {
 		var s model.Transaction
-		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Period, &s.Currency, &s.Status, &s.Value)
 
 		transactions = append(transactions, s)
 	}
@@ -112,8 +112,8 @@ func (r *TransactionRepository) ChangeStatus(id int, status string) error {
 	return nil
 }
 
-func (r *TransactionRepository) GetByUserIdFromReference(userId int, reference string) ([]model.Transaction, error) {
-	result, err := r.Db.Query("SELECT id, name, description, direction, reference, currency, status, value FROM transactions WHERE user_id = ? AND reference = '?'", userId, reference)
+func (r *TransactionRepository) GetByUserIdFromPeriod(userId int, period string) ([]model.Transaction, error) {
+	result, err := r.Db.Query("SELECT id, name, description, direction, period, currency, status, value FROM transactions WHERE user_id = ? AND period = '?'", userId, period)
 	if err != nil {
 		return []model.Transaction{}, err
 	}
@@ -122,7 +122,7 @@ func (r *TransactionRepository) GetByUserIdFromReference(userId int, reference s
 
 	for result.Next() {
 		var s model.Transaction
-		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Reference, &s.Currency, &s.Status, &s.Value)
+		result.Scan(&s.Id, &s.Name, &s.Description, &s.Direction, &s.Period, &s.Currency, &s.Status, &s.Value)
 
 		transactions = append(transactions, s)
 	}
@@ -130,8 +130,8 @@ func (r *TransactionRepository) GetByUserIdFromReference(userId int, reference s
 	return transactions, nil
 }
 
-func (r *TransactionRepository) CountByUserIdFromReference(userId int, reference string) (int, error) {
-	result, err := r.Db.Query("SELECT count(*) as total FROM transactions WHERE user_id = ? AND reference = '?'", userId, reference)
+func (r *TransactionRepository) CountByUserIdFromPeriod(userId int, period string) (int, error) {
+	result, err := r.Db.Query("SELECT count(*) as total FROM transactions WHERE user_id = ? AND period = '?'", userId, period)
 	if err != nil {
 		return 0, err
 	}

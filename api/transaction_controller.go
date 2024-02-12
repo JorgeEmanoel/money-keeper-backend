@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -47,6 +48,33 @@ type TransactionJson struct {
 	Value       int    `json:"value"`
 	Currency    string `json:"currency"`
 	Status      string `json:"status"`
+}
+
+type CreateBody struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Direction   string `json:"direction"`
+	Currency    string `json:"currency"`
+	Period      string `json:"period"`
+	Value       int    `json:"value"`
+}
+
+func (c *TransactionController) HandleCreate(w http.ResponseWriter, req *http.Request) {
+	var body CreateBody
+
+	err := json.NewDecoder(req.Body).Decode(&body)
+	if err != nil {
+		c.r.json(w, map[string]string{"message": "Invalid payload received"}, http.StatusBadRequest)
+		return
+	}
+
+	id, err := c.repo.Store(body.Name, body.Description, body.Direction, body.Period, body.Currency, TRANSACTION_STATUS_PENDING, body.Value, req.Context().Value("user.id").(int))
+	if err != nil {
+		c.r.json(w, map[string]string{"message": "Internal server error"}, http.StatusInternalServerError)
+		return
+	}
+
+	c.r.json(w, map[string]int{"id": id}, http.StatusCreated)
 }
 
 func (c *TransactionController) HandleList(w http.ResponseWriter, req *http.Request) {

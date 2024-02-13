@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/JorgeEmanoel/money-keeper-backend/model"
@@ -68,7 +69,7 @@ func (c *TransactionController) HandleCreate(w http.ResponseWriter, req *http.Re
 		return
 	}
 
-	id, err := c.repo.Store(body.Name, body.Description, body.Direction, body.Period, body.Currency, TRANSACTION_STATUS_PENDING, body.Value, req.Context().Value("user.id").(int))
+	id, err := c.repo.Store(body.Name, body.Description, body.Direction, body.Period, body.Currency, TRANSACTION_STATUS_PENDING, body.Value*100, req.Context().Value("user.id").(int))
 	if err != nil {
 		c.r.json(w, map[string]string{"message": "Internal server error"}, http.StatusInternalServerError)
 		return
@@ -136,12 +137,18 @@ func (c *TransactionController) HandleOutcomingList(w http.ResponseWriter, req *
 
 		transactionsResponse = append(transactionsResponse, p)
 
-		if p.Status == "pending" {
+		if p.Status == TRANSACTION_STATUS_PENDING {
 			totalPending += p.Value
 		}
 
-		total += p.Value
+		if p.Status == TRANSACTION_STATUS_PAID {
+			total += p.Value
+		}
 	}
+
+	sort.Slice(transactionsResponse, func(a, b int) bool {
+		return transactionsResponse[a].Status != TRANSACTION_STATUS_PAID
+	})
 
 	response := map[string]any{
 		"transactions": transactionsResponse,
@@ -179,12 +186,18 @@ func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *h
 
 		transactionsResponse = append(transactionsResponse, p)
 
-		if p.Status == "pending" {
+		if p.Status == TRANSACTION_STATUS_PENDING {
 			totalPending += p.Value
 		}
 
-		total += p.Value
+		if p.Status != TRANSACTION_STATUS_CANCELED {
+			total += p.Value
+		}
 	}
+
+	sort.Slice(transactionsResponse, func(a, b int) bool {
+		return transactionsResponse[a].Status != TRANSACTION_STATUS_PAID
+	})
 
 	response := map[string]any{
 		"transactions": transactionsResponse,
@@ -201,7 +214,7 @@ func (c *TransactionController) HandleChangeStatus(w http.ResponseWriter, req *h
 	id, _ := strconv.Atoi(params["id"])
 	status := params["status"]
 
-	if status != TRANSACTION_STATUS_PAID || status != TRANSACTION_STATUS_PENDING || status != TRANSACTION_STATUS_CANCELED {
+	if status != TRANSACTION_STATUS_PAID && status != TRANSACTION_STATUS_PENDING && status != TRANSACTION_STATUS_CANCELED {
 		c.r.json(w, map[string]string{"message": "Invalid status"}, http.StatusBadRequest)
 	}
 

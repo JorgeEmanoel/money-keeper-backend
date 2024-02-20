@@ -6,6 +6,6 @@ type Skeleton struct {
 	Description string
 	Direction   string
 	Frequency   string
-	Value       int
+	Value       float64
 	Currency    string
 }

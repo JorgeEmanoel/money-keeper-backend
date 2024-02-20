@@ -5,13 +5,14 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/JorgeEmanoel/money-keeper-backend/model"
 	"github.com/gorilla/mux"
 )
 
 type SkeletonRepository interface {
-	Store(name, description, direction, frequency, currency string, value, planId, ownerId int) (int, error)
+	Store(name, description, direction, frequency, currency string, value float64, planId, ownerId int) (int, error)
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Skeleton, error)
 	GetIncomingsByUserId(userId int) ([]model.Skeleton, error)
@@ -31,13 +32,13 @@ func MakeSkeletonController(repo SkeletonRepository, r *Router) *SkeletonControl
 }
 
 type SkeletonJson struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Direction   string `json:"direction"`
-	Frequency   string `json:"frequency"`
-	Value       int    `json:"value"`
-	Currency    string `json:"currency"`
+	Id          int     `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Direction   string  `json:"direction"`
+	Frequency   string  `json:"frequency"`
+	Value       float64 `json:"value"`
+	Currency    string  `json:"currency"`
 }
 
 func (c *SkeletonController) HandleList(w http.ResponseWriter, req *http.Request) {
@@ -49,7 +50,7 @@ func (c *SkeletonController) HandleList(w http.ResponseWriter, req *http.Request
 	}
 
 	var skeletonsResponse []SkeletonJson
-	total := 0
+	var total float64
 
 	for _, skeleton := range skeletons {
 		p := SkeletonJson{
@@ -83,7 +84,7 @@ func (c *SkeletonController) HandleIncomingList(w http.ResponseWriter, req *http
 	}
 
 	var skeletonsResponse []SkeletonJson
-	total := 0
+	var total float64
 
 	for _, skeleton := range skeletons {
 		p := SkeletonJson{
@@ -117,7 +118,7 @@ func (c *SkeletonController) HandleOutocomingList(w http.ResponseWriter, req *ht
 	}
 
 	var skeletonsResponse []SkeletonJson
-	total := 0
+	var total float64
 
 	for _, skeleton := range skeletons {
 		p := SkeletonJson{
@@ -147,7 +148,7 @@ type CreateSkeletonBody struct {
 	Description string `json:"description"`
 	Direction   string `json:"direction"`
 	Frequency   string `json:"frequency"`
-	Value       int    `json:"value"`
+	Value       string `json:"value"`
 	Currency    string `json:"currency"`
 }
 
@@ -161,13 +162,18 @@ func (c *SkeletonController) HandleCreate(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
+	cleanValue := strings.ReplaceAll(body.Value, ".", "")
+	cleanValue = strings.ReplaceAll(cleanValue, ",", ".")
+
+	value, _ := strconv.ParseFloat(cleanValue, 64)
+
 	id, err := c.repo.Store(
 		body.Name,
 		body.Description,
 		body.Direction,
 		body.Frequency,
 		body.Currency,
-		body.Value,
+		value,
 		planId,
 		req.Context().Value("user.id").(int),
 	)

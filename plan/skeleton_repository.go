@@ -17,7 +17,7 @@ func MakeSkeletonRepository(db *sql.DB) *SkeletonRepository {
 	}
 }
 
-func (r *SkeletonRepository) Store(name, description, direction, frequency, currency string, value, planId, ownerId int) (int, error) {
+func (r *SkeletonRepository) Store(name, description, direction, frequency, currency string, value float64, planId, ownerId int) (int, error) {
 	result, err := r.Db.Exec("INSERT INTO skeletons (name, description, direction, frequency, value, currency, plan_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, frequency, value*100, currency, planId, ownerId)
 	if err != nil {
 		return 0, err

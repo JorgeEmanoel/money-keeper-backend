@@ -18,7 +18,7 @@ var (
 )
 
 type TransactionRepository interface {
-	Store(name, description, direction, period, currency, status string, value, ownerId int) (int, error)
+	Store(name, description, direction, period, currency, status string, value float64, ownerId int) (int, error)
 	Delete(id int) error
 	GetByUserId(userId int) ([]model.Transaction, error)
 	ChangeStatus(id int, status string) error
@@ -41,23 +41,23 @@ func MakeTransactionController(repo TransactionRepository, r *Router) *Transacti
 }
 
 type TransactionJson struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Direction   string `json:"direction"`
-	Period      string `json:"period"`
-	Value       int    `json:"value"`
-	Currency    string `json:"currency"`
-	Status      string `json:"status"`
+	Id          int     `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Direction   string  `json:"direction"`
+	Period      string  `json:"period"`
+	Value       float64 `json:"value"`
+	Currency    string  `json:"currency"`
+	Status      string  `json:"status"`
 }
 
 type CreateBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Direction   string `json:"direction"`
-	Currency    string `json:"currency"`
-	Period      string `json:"period"`
-	Value       int    `json:"value"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Direction   string  `json:"direction"`
+	Currency    string  `json:"currency"`
+	Period      string  `json:"period"`
+	Value       float64 `json:"value"`
 }
 
 func (c *TransactionController) HandleCreate(w http.ResponseWriter, req *http.Request) {
@@ -120,8 +120,8 @@ func (c *TransactionController) HandleOutcomingList(w http.ResponseWriter, req *
 	}
 
 	transactionsResponse := make([]TransactionJson, 0)
-	totalPending := 0
-	total := 0
+	totalPending := 0.0
+	total := 0.0
 
 	for _, transaction := range transactions {
 		p := TransactionJson{
@@ -169,8 +169,8 @@ func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *h
 	}
 
 	transactionsResponse := make([]TransactionJson, 0)
-	totalPending := 0
-	total := 0
+	totalPending := 0.0
+	total := 0.0
 
 	for _, transaction := range transactions {
 		p := TransactionJson{

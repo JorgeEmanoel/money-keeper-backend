@@ -5,7 +5,7 @@ type Transaction struct {
 	Name        string
 	Description string
 	Direction   string
-	Value       int
+	Value       float64
 	Currency    string
 	Period      string
 	Status      string

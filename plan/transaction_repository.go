@@ -17,7 +17,7 @@ func MakeTransactionRepository(db *sql.DB) *TransactionRepository {
 	}
 }
 
-func (r *TransactionRepository) Store(name, description, direction, period, currency, status string, value, ownerId int) (int, error) {
+func (r *TransactionRepository) Store(name, description, direction, period, currency, status string, value float64, ownerId int) (int, error) {
 	result, err := r.Db.Exec("INSERT INTO transactions (name, description, direction, period, currency, status, value, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", name, description, direction, period, currency, status, value, ownerId)
 	if err != nil {
 		return 0, err

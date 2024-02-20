@@ -120,8 +120,8 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 	}
 
 	var (
-		totalIncomings  = 0
-		totalOutcomings = 0
+		totalIncomings  = 0.0
+		totalOutcomings = 0.0
 	)
 
 	for _, transaction := range transactions {

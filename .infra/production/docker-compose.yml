@@ -4,7 +4,9 @@ services:
     image: ${IMAGE}
     container_name: money_keeper_api_prd
     restart: on-failure
-    command: serve
+    command:
+      - source /app/.env &&
+      - /bin/money-keeper-backend serve
     ports:
       - 8080:8080
 

@@ -10,8 +10,8 @@ RUN go build -o money-keeper-backend
 
 FROM scratch
 
-COPY --from=buildstage /app/money-keeper-backend /usr/bin
+COPY --from=buildstage /app/money-keeper-backend /bin
 
 EXPOSE 8080
 
-ENTRYPOINT [ "/usr/bin/money-keeper-backend" ]
+ENTRYPOINT [ "/bin/money-keeper-backend" ]

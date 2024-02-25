@@ -14,4 +14,4 @@ COPY --from=buildstage /app/money-keeper-backend /usr/bin
 
 EXPOSE 8080
 
-ENTRYPOINT [ "money-keeper-backend" ]
+ENTRYPOINT [ "/usr/bin/money-keeper-backend" ]

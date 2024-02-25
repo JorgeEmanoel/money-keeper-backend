@@ -3,7 +3,6 @@ services:
   api:
     image: ${IMAGE}
     container_name: money_keeper_api_prd
-    working_dir: /app
     restart: on-failure
     command: serve
     ports:

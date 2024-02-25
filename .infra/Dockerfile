@@ -7,7 +7,7 @@ WORKDIR /app
 RUN go mod tidy
 RUN go build -o money-keeper-backend
 
-FROM scratch
+FROM ubuntu:22.04
 
 COPY --from=buildstage /app/money-keeper-backend /bin
 

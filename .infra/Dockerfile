@@ -4,8 +4,7 @@ COPY . /app
 
 WORKDIR /app
 
-RUN go install
-
+RUN go mod tidy
 RUN go build -o money-keeper-backend
 
 FROM scratch

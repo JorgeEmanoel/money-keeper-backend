@@ -1,3 +1,5 @@
 tmp/
 *.http
 .env
+.env.production
+.env.local

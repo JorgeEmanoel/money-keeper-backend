@@ -10,7 +10,7 @@ RUN go build -o money-keeper-backend
 FROM ubuntu:22.04
 
 RUN mkdir /app
-COPY .env /app/.env
+COPY .env.production /app/.env
 COPY --from=buildstage /app/money-keeper-backend /bin
 
 EXPOSE 8080

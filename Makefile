@@ -33,6 +33,10 @@ api:
 logs:
 	docker logs -f money_keeper_api
 
+.PHONY: logs-prod
+logs-prod:
+	docker logs -f money_keeper_api_prd
+
 .PHONY: migrate
 migrate:
 	docker exec -i money_keeper_api sh -c "/app/tmp/main migrate"

@@ -88,7 +88,7 @@ func (h *Handler) Start() {
 	transactionRouter.HandleFunc("/{id}", transactionsController.HandleDelete).Methods(http.MethodDelete)
 
 	allowedMethods := handlers.AllowedMethods([]string{"OPTIONS", "GET", "PATCH", "PUT", "POST", "DELETE"})
-	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:3000"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"https://saturn.jorgeemanoel.com", "https://srn.jorgeemanoel.com"})
 	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Accept", "Authorization"})
 
 	http.ListenAndServe(

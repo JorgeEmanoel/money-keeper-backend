@@ -11,6 +11,7 @@ FROM ubuntu:22.04
 
 RUN mkdir /app
 COPY .env.production /app/.env
+COPY migrations /app/migrations
 COPY --from=buildstage /app/money-keeper-backend /bin
 
 EXPOSE 8080

@@ -125,7 +125,7 @@ func (c *PlanController) HandleSummary(w http.ResponseWriter, req *http.Request)
 	)
 
 	for _, transaction := range transactions {
-		if transaction.Status == TRANSACTION_STATUS_CANCELED {
+		if transaction.Status == TRANSACTION_STATUS_CANCELLED {
 			continue
 		}
 

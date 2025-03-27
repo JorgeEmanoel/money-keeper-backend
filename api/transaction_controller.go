@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	TRANSACTION_STATUS_PENDING  = "pending"
-	TRANSACTION_STATUS_PAID     = "paid"
-	TRANSACTION_STATUS_CANCELED = "canceled"
+	TRANSACTION_STATUS_PENDING   = "pending"
+	TRANSACTION_STATUS_PAID      = "paid"
+	TRANSACTION_STATUS_CANCELLED = "cancelled"
 )
 
 type TransactionRepository interface {
@@ -190,7 +190,7 @@ func (c *TransactionController) HandleIncomingList(w http.ResponseWriter, req *h
 			totalPending += p.Value
 		}
 
-		if p.Status != TRANSACTION_STATUS_CANCELED {
+		if p.Status != TRANSACTION_STATUS_CANCELLED {
 			total += p.Value
 		}
 	}
@@ -214,7 +214,7 @@ func (c *TransactionController) HandleChangeStatus(w http.ResponseWriter, req *h
 	id, _ := strconv.Atoi(params["id"])
 	status := params["status"]
 
-	if status != TRANSACTION_STATUS_PAID && status != TRANSACTION_STATUS_PENDING && status != TRANSACTION_STATUS_CANCELED {
+	if status != TRANSACTION_STATUS_PAID && status != TRANSACTION_STATUS_PENDING && status != TRANSACTION_STATUS_CANCELLED {
 		c.r.json(w, map[string]string{"message": "Invalid status"}, http.StatusBadRequest)
 	}
 

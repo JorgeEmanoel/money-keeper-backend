@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     value INT NOT NULL,
     currency ENUM('BRL', 'USD') DEFAULT 'BRL',
     period CHAR(7),
-    status ENUM('pending', 'paid', 'canceled'),
+    status ENUM('pending', 'paid', 'cancelled'),
     user_id INT NOT NULL,
     created_at TIMESTAMP default CURRENT_TIMESTAMP,
     updated_at TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
